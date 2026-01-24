@@ -2,13 +2,19 @@ namespace ConfigVault.Domain;
 
 public class ConfigVersion
 {
-    public ConfigStatus Status { get; private set; }
+    public Guid Id { get; }
+
+    public ConfigStatus Status { get; private set; } = ConfigStatus.Draft;
 
     public ConfigVersion()
     {
         Status = ConfigStatus.Draft;
     }
 
+    public ConfigVersion(Guid id)
+    {
+        Id = id;
+    }
     public void Approve()
     {
         if (Status != ConfigStatus.Draft)

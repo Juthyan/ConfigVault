@@ -28,3 +28,21 @@ Business rules are enforced directly in the domain model:
 - `ConfigVersion` exposes methods (`Approve`, `Activate`, `Archive`) instead of public setters.
 - Invalid transitions throw a `DomainException`.
 - Domain tests (in `ConfigVault.Domain.Tests`) prove that forbidden state transitions cannot happen.
+
+The next iteration of ConfigVault will focus on exposing the domain in a controlled and explicit way, without compromising its integrity.
+
+## Soon
+
+### Application Layer
+- Introduce explicit use cases (ApproveConfiguration, ActivateConfiguration, ArchiveConfiguration)
+- Ensure all orchestration logic lives outside the domain
+- Keep the domain model free of technical concerns
+
+### API Layer
+- Minimal HTTP API to trigger use cases
+- No business rules in controllers
+- Domain exceptions translated into meaningful API responses
+
+### Audit & Traceability
+- Centralized audit trail for all state transitions
+- Clear trace of who performed which action and when
