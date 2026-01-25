@@ -2,10 +2,18 @@ using ConfigVault.Api.Models;
 using ConfigVault.Application;
 using ConfigVault.Domain;
 using ConfigVault.Infrastructure.Repositories;
+using ConfigVault.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<IConfigVersionRepository, InMemoryConfigVersionRepository>();
+var connectionString = builder.Configuration.GetConnectionString("ConfigVault")
+                       ?? "Data Source=configvault.db";
+
+builder.Services.AddDbContext<ConfigVaultDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+builder.Services.AddScoped<IConfigVersionRepository, EfCoreConfigVersionRepository>();
 builder.Services.AddScoped<ApproveConfigVersionHandler>();
 builder.Services.AddScoped<ActivateConfigVersionHandler>();
 

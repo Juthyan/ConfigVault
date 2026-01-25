@@ -47,6 +47,32 @@ The domain layer has no dependency on the API or infrastructure.
 
 ---
 
+## Persistence
+
+ConfigVault uses **EF Core** with **SQLite** to persist configuration versions.
+
+- the domain model (`ConfigVersion`) is mapped directly through `ConfigVaultDbContext`
+- the repository interface (`IConfigVersionRepository`) has two possible implementations:
+  - an in-memory repository (used initially)
+  - an EF Core repository (`EfCoreConfigVersionRepository`) backed by SQLite
+
+The goal of this persistence layer is not to model a complex schema, but to validate that the domain model and architecture hold up once data is stored and reloaded.
+
+---
+
+## Logging
+
+Basic structured logging is implemented at the application layer using `ILogger<T>`.
+
+Logs capture:
+- the execution of application commands
+- successful lifecycle transitions
+- rejected operations (e.g. missing configuration or invalid state)
+
+The domain layer remains free of logging or infrastructure concerns.
+
+---
+
 ## API Usage
 
 ### Create a configuration
@@ -139,3 +165,4 @@ Future changes will focus on:
 - small refinements to existing behavior
 
 No feature expansion is planned beyond what is necessary to support these goals.
+
