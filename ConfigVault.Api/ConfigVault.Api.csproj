@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConfigVault.Domain\ConfigVault.Domain.csproj" />
+    <ProjectReference Include="..\ConfigVault.Application\ConfigVault.Application.csproj" />
+    <ProjectReference Include="..\ConfigVault.Infrastructure\ConfigVault.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

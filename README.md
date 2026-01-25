@@ -1,48 +1,141 @@
-# ConfigVault V1
+# ConfigVault
 
-ConfigVault is a domain driven system built in dotnet to prevent wrong configuration in critical system.
+## Purpose
 
-## Why this project 
+ConfigVault is a backend-focused project built to practice **clean architecture**, **domain-driven design**, and **explicit state management**.
 
-Configuration error in Telemetry system can cause outage, alert, etc  
-Telemetry configurations define how raw technical data is interpreted, monitored, and acted upon in critical systems.  
-In industries like aerospace and telecom, misconfigured telemetry can lead to false alarms, missed failures, or invalid test results.
+The goal is to model a **configuration lifecycle** where invalid transitions are impossible by design, and where business rules are enforced at the **domain level**, not in the API.
 
-## V1 Scope
-- Configuration versioning
-- Explicit workflow: Draft → Approved → Active → Archived
-- Strict domain rules
+This project is intentionally small and focused on **correctness and predictability**, not feature count.
 
-## Core rules
+---
 
-- a rule must be a draft at the beginning
-- the draft must be approved 
-- once the draft has been approved it can be activated
-- an ctive rule cant be modified
-- only an active reule can be archived
+## Problem
 
-## How rules are enforced
+In real systems, configuration changes are risky:
+- activating an unvalidated configuration can cause outages
+- unclear lifecycle rules lead to inconsistent states
+- configuration issues are hard to diagnose without traceability
 
-Business rules are enforced directly in the domain model:
+ConfigVault addresses this by enforcing a **strict lifecycle** and explicit rules.
 
-- `ConfigVersion` exposes methods (`Approve`, `Activate`, `Archive`) instead of public setters.
-- Invalid transitions throw a `DomainException`.
-- Domain tests (in `ConfigVault.Domain.Tests`) prove that forbidden state transitions cannot happen.
+---
 
-The next iteration of ConfigVault will focus on exposing the domain in a controlled and explicit way, without compromising its integrity.
+## Core Domain
 
-## Soon
+### Configuration Lifecycle
 
-### Application Layer
-- Introduce explicit use cases (ApproveConfiguration, ActivateConfiguration, ArchiveConfiguration)
-- Ensure all orchestration logic lives outside the domain
-- Keep the domain model free of technical concerns
+A configuration version follows this lifecycle:
 
-### API Layer
-- Minimal HTTP API to trigger use cases
-- No business rules in controllers
-- Domain exceptions translated into meaningful API responses
 
-### Audit & Traceability
-- Centralized audit trail for all state transitions
-- Clear trace of who performed which action and when
+Rules enforced by the domain:
+- a configuration always starts as `Draft`
+- only an `Approved` configuration can be activated
+- an `Active` configuration can be archived
+- invalid transitions are rejected explicitly
+
+All rules live inside the **domain model**, not in the API.
+
+---
+
+## Architecture
+
+The project follows a layered architecture inspired by DDD:
+
+
+The domain layer has no dependency on the API or infrastructure.
+
+---
+
+## API Usage
+
+### Create a configuration
+
+```bash
+curl -X POST http://localhost:5251/config-versions
+
+Respone
+
+{
+  "id": "uuid",
+  "status": "Draft"
+}
+````
+
+### Approve a configuration
+
+```bash
+curl -X POST http://localhost:5251/config-versions/{id}/approve
+
+Respone
+
+204 No Content
+````
+
+### Activate a configuration
+
+```bash
+curl -X POST http://localhost:5251/config-versions/{id}/activate
+
+Respone
+
+204 No Content
+````
+
+### Get configuration status
+
+```bash
+curl -X POST http://localhost:5251/config-versions/{id}/activate
+
+Respone
+
+204 No Content
+````
+
+## Error Handling
+
+Invalid operations are rejected explicitly by the domain:
+- activating a configuration that has not been approved
+- invalid state transitions
+- unknown configuration identifiers
+
+Business rule violations are represented as domain exceptions and mapped to HTTP responses.
+The goal is to ensure **predictable failures** rather than silent or implicit behavior.
+
+---
+
+## Testing
+
+The domain layer is covered by unit tests using xUnit.
+
+Tests focus on:
+- valid and invalid state transitions
+- enforcement of domain invariants
+
+The API layer remains thin and delegates all business logic to the domain.
+Testing is centered on **behavior correctness**, not on exhaustive coverage.
+
+---
+
+## Planned Improvements
+
+The following improvements are planned to strengthen the system from an operational perspective:
+
+- structured logging of configuration lifecycle events
+- basic metrics (e.g. number of transitions, rejected operations)
+- improved traceability of configuration changes
+
+These additions aim to improve **observability** without increasing architectural complexity.
+
+---
+
+## Project Status
+
+ConfigVault is currently in a **stable state**.
+
+Future changes will focus on:
+- observability
+- documentation clarity
+- small refinements to existing behavior
+
+No feature expansion is planned beyond what is necessary to support these goals.
