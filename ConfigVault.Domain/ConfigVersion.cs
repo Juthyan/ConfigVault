@@ -6,6 +6,8 @@ public class ConfigVersion
 
     public ConfigStatus Status { get; private set; } = ConfigStatus.Draft;
 
+    private ConfigVersion() { }
+    
     public ConfigVersion(Guid id)
     {
         Id = id;
