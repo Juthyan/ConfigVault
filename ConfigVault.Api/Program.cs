@@ -19,15 +19,22 @@ builder.Services.AddScoped<ActivateConfigVersionHandler>();
 
 var app = builder.Build();
 
-app.MapPost("/config-versions", (IConfigVersionRepository repo) =>
+app.MapPost("/config-versions", (CreateConfigVersionRequest request, IConfigVersionRepository repo) =>
 {
-    var id = Guid.NewGuid();
-    var version = new ConfigVersion(id);
+    try
+    {
+        var version = ConfigVersion.CreateDraft(
+            request.Key, request.Content, DateTimeOffset.UtcNow);
 
-    repo.Save(version);
+        repo.Save(version);
 
-    var response = new ConfigVersionResponse(version.Id, version.Status.ToString());
-    return Results.Created($"/config-versions/{version.Id}", response);
+        var response = new ConfigVersionResponse(version.Id, version.Status.ToString());
+        return Results.Created($"/config-versions/{version.Id}", response);
+    }
+    catch (DomainException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
 });
 
 app.MapPost("/config-versions/{id:guid}/approve", (Guid id, ApproveConfigVersionHandler handler) =>

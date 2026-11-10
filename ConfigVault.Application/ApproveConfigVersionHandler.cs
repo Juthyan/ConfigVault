@@ -33,9 +33,9 @@ public class ApproveConfigVersionHandler
             throw new DomainException($"Config version {command.ConfigVersionId} not found.");
         }
 
-        version.Approve();
+        version.Approve(DateTimeOffset.UtcNow);
         _repository.Save(version);
-        
+
         _logger.LogInformation(
             "Config version {ConfigVersionId} approved successfully",
             command.ConfigVersionId

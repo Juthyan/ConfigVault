@@ -5,5 +5,6 @@ public enum ConfigStatus
     Draft,
     Approved,
     Active,
-    Archived
+    Archived,
+    rejected
 }

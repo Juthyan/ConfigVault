@@ -14,12 +14,12 @@ public class ActivateConfigVersionHandlerTests
         var repo = new InMemoryConfigVersionRepository();
         var logger = NullLogger<ActivateConfigVersionHandler>.Instance;
 
-        var id = Guid.NewGuid();
-
-        var version = new ConfigVersion(id);
-        version.Approve();
+        var createdAt = new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        var version = ConfigVersion.CreateDraft("genetec.health", "{\"enabled\": true}", createdAt);
+        version.Approve(createdAt.AddHours(1));
 
         repo.Save(version);
+        var id = version.Id;
 
         var handler = new ActivateConfigVersionHandler(repo, logger);
         var command = new ActivateConfigVersionCommand(id);

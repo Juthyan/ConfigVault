@@ -21,7 +21,7 @@ public class EfCoreConfigVersionRepository : IConfigVersionRepository
             .SingleOrDefault(v => v.Id == id);
     }
 
-      public void Save(ConfigVersion version)
+    public void Save(ConfigVersion version)
     {
         var exists = _context.ConfigVersions
             .Any(v => v.Id == version.Id);
